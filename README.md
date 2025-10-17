@@ -17,6 +17,34 @@ This project is about building a reliable multi-client chat service that runs ov
 ---
 
 ### **3. Transport Protocol Design Plan**
+We have chosen Selective Repeat ARQ for our chat room application for the following reasons:
+
+Efficiency under loss: In a chat application, especially under bursty loss conditions (8-12%), Selective Repeat outperforms Go-Back-N by only retransmitting lost packets rather than the entire window. This significantly reduces bandwidth waste and improves goodput.
+Lower latency: Chat messages are typically small and latency-sensitive. Selective Repeat minimizes head-of-line blocking by allowing out-of-order packets to be buffered and delivered once gaps are filled, rather than discarding them entirely as Go-Back-N would.
+Better flow control: With independent acknowledgment of each packet, the sender receives more granular feedback about what the receiver has successfully received, enabling more precise flow control decisions.
+Scalability: For a multi-client chat server, Selective Repeat's ability to maintain higher throughput under packet loss means the server can handle more concurrent connections without performance degradation.
+
+The trade-off is increased implementation complexity (managing out-of-order buffers at both sender and receiver), but this is justified given our requirement to handle bursty loss profiles while maintaining low latency for real-time chat.
+
+
+
+
+Total Header Size: 20 bytes
+Additional SACK Extension (optional field in payload):
+•	When ACK flag is set, the payload may contain SACK (Selective Acknowledgment) blocks
+•	Each SACK block: 8 bytes (4-byte start seq, 4-byte end seq)
+•	Up to 4 SACK blocks per ACK packet to indicate non-contiguous received ranges
+
+
+
+
+Reliability Logic
+This transport protocol is implemented over UDP, which provides only best-effort, connectionless delivery. To add reliability and flow control, our design implements a Selective Repeat Automatic Repeat Request (ARQ) mechanism entirely in user space. Each data segment is sent as a single UDP datagram that includes our custom header and payload.
+Every outgoing UDP datagram is assigned a sequence number and tracked in a send buffer. The receiver checks sequence numbers and verifies integrity using the custom checksum field. If a packet arrives intact, the receiver sends back an ACK (also a UDP datagram) containing the highest contiguous sequence received and optional Selective ACK (SACK) blocks for any additional packets that arrived out of order.
+Each sent packet has its own timer. If an ACK or SACK is not received before the retransmission timeout (RTO) expires, the sender retransmits only that missing packet. The RTO is adjusted dynamically based on measured round-trip times (RTTs), and exponential backoff is used after repeated losses.
+The receiver buffers out-of-order packets and reassembles them into the correct sequence before delivering them to the application layer. The receiver’s advertised window (in bytes or packets) limits how much data the sender may transmit before waiting for further acknowledgments.
+All control (SYN, ACK, FIN) and data exchanges occur over UDP; our protocol implements its own reliability, ordering, and connection management on top of UDP.
+
 
 ---
 
@@ -96,6 +124,7 @@ The server is designed to support multiple clients using **multi-threading**:
 
 
 * **Evidence of progress:** TThis README shows the work completed so far. It covers the design and planning phase in detail and lays out a clear roadmap for building and testing the rest of the project.
+
 
 
 
