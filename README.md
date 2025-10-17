@@ -16,6 +16,10 @@ This project is about building a reliable multi-client chat service that runs ov
 
 ---
 
+### **2. Application Logic Plan**
+
+---
+
 ### **6. Progress Summary (10/17 Status)**
 
 * **What has been implemented so far:** The full project plan and system design are finished and documented in this README. The packet structure for the transport layer is defined, and the command grammar for the application layer is set. There are 2 very simple chat_client.py and chat_server.py files as placeholders.
@@ -24,3 +28,4 @@ This project is about building a reliable multi-client chat service that runs ov
 
 
 * **Evidence of progress:** TThis README shows the work completed so far. It covers the design and planning phase in detail and lays out a clear roadmap for building and testing the rest of the project.
+
