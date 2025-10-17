@@ -26,6 +26,20 @@ Scalability: For a multi-client chat server, Selective Repeat's ability to maint
 
 The trade-off is increased implementation complexity (managing out-of-order buffers at both sender and receiver), but this is justified given our requirement to handle bursty loss profiles while maintaining low latency for real-time chat.
 
+Our transport protocol header will be **20 bytes total**, structured as follows:
+
+| **Field** | **Size (bytes)** | **Purpose** | **Details** |
+|------------|------------------|--------------|--------------|
+| `ver` | 1 | Protocol version | Version identifier (currently 0x01). Allows future protocol evolution. |
+| `flags` | 1 | Control flags | Bit flags: SYN (0x01), ACK (0x02), FIN (0x04), RST (0x08). Controls connection lifecycle and packet type. |
+| `conn_id` | 4 | Connection identifier | Unique 32-bit connection ID generated during handshake. Allows multiplexing multiple connections over same UDP port. |
+| `seq` | 4 | Sequence number | 32-bit sequence number for reliable ordering. Wraps around at 2^32. Increments per packet (not per byte). |
+| `ack` | 4 | Acknowledgment number | Cumulative ACK: highest in-order sequence received. Combined with SACK for Selective Repeat. |
+| `window` | 2 | Receiver window size | Advertised receive window (0–65535 packets). Used for flow control to prevent receiver buffer overflow. |
+| `len` | 2 | Payload length | Length of payload data in bytes (0–65535). Does not include header. |
+| `checksum` | 2 | Header + payload checksum | 16-bit CRC or Internet checksum for error detection. Computed over entire packet (header + payload). |
+
+**Total Header Size:** 20 bytes
 
 
 
@@ -124,6 +138,7 @@ The server is designed to support multiple clients using **multi-threading**:
 
 
 * **Evidence of progress:** TThis README shows the work completed so far. It covers the design and planning phase in detail and lays out a clear roadmap for building and testing the rest of the project.
+
 
 
 
