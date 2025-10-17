@@ -84,20 +84,6 @@ The server is designed to support multiple clients using **multi-threading**:
 
 ---
 
-*This section (Part 3) was written by Annmarie Kongglang as part of the team’s midterm milestone assignment.*
-
----
-
-After you paste this, scroll down and click:  
-✅ **Commit changes → Commit directly to the main branch → Commit changes**
-
----
-
-Would you like me to add a small **diagram (Mermaid code)** showing the message flow between *Client ↔ Server ↔ Room*? It will make your README look more professional for the midterm submission.
-
-
----
-
 ### **5. Testing and Metrics Plan**
 
 ---
@@ -110,6 +96,7 @@ Would you like me to add a small **diagram (Mermaid code)** showing the message 
 
 
 * **Evidence of progress:** TThis README shows the work completed so far. It covers the design and planning phase in detail and lays out a clear roadmap for building and testing the rest of the project.
+
 
 
 
