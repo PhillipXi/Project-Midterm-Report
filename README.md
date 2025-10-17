@@ -16,7 +16,15 @@ This project is about building a reliable multi-client chat service that runs ov
 
 ---
 
+### **3. Transport Protocol Design Plan**
+
+---
+
 ### **4. Application Logic Plan**
+
+---
+
+### **5. Testing and Metrics Plan**
 
 ---
 
@@ -28,5 +36,6 @@ This project is about building a reliable multi-client chat service that runs ov
 
 
 * **Evidence of progress:** TThis README shows the work completed so far. It covers the design and planning phase in detail and lays out a clear roadmap for building and testing the rest of the project.
+
 
 
