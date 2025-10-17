@@ -22,6 +22,80 @@ This project is about building a reliable multi-client chat service that runs ov
 
 ### **4. Application Logic Plan**
 
+### Command Grammar 
+
+The ** Group Chat with Rooms + Presence** application uses a text-based message structure for client-server communication. Each command or message follows this format: 
+
+
+#### Client → Server Commands
+
+| Command | Example | Description |
+|----------|----------|-------------|
+| `JOIN <room>` | `JOIN main` | Client joins (or creates) a chat room. |
+| `LEAVE <room>` | `LEAVE main` | Client leaves the specified room. |
+| `MSG <room> <text>` | `MSG main Hello everyone!` | Sends a message to all users in that room. |
+| `WHO <room>` | `WHO main` | Requests a list of users in the room. |
+| `QUIT` | `QUIT` | Gracefully disconnects from the server. |
+
+#### Server → Client Messages
+
+| Message | Example | Description |
+|----------|----------|-------------|
+| `SYS <text>` | `SYS Welcome to the chat server!` | System or status message. |
+| `MSG <room> <sender>: <text>` | `MSG main Ann: Hi there!` | Broadcast message sent to a room. |
+| `JOINED <room> <user>` | `JOINED main Alissa` | Notifies users when someone joins. |
+| `LEFT <room> <user>` | `LEFT main Lek` | Notifies users when someone leaves. |
+| `USERS <room> <user1,user2,...>` | `USERS main Ann, Alissa, Lek` | Lists all users in the specified room. |
+
+---
+
+### Client–Server Interaction
+
+The steps below describe how clients and the server communicate:
+
+1. **Connection Established**  
+   - The client connects to the server using the reliable transport layer.  
+   - The server sends: `SYS Welcome`.
+
+2. **Join a Room**  
+   - The client sends: `JOIN <room>`.  
+   - The server adds the client and broadcasts `JOINED <room> <username>` to others in that room.
+
+3. **Chat Messaging**  
+   - The client sends: `MSG <room> <text>`.  
+   - The server relays it to everyone in the room as `MSG <room> <sender>: <text>`.
+
+4. **Presence Updates**  
+   - When users join or leave, `JOINED` or `LEFT` messages are broadcast to notify all connected clients.
+
+5. **Disconnection**  
+   - When a client sends `QUIT` or closes their connection, the server removes them and sends `LEFT` notifications.
+
+---
+
+### Concurrency Plan
+
+The server is designed to support multiple clients using **multi-threading**:
+
+- Each client connection is managed by a **separate thread**.  
+- The server’s main thread accepts connections; worker threads handle I/O for each client.  
+- Shared resources like message queues and room membership lists are synchronized with **locks** or **mutexes** to avoid conflicts.  
+- This ensures smooth message delivery and real-time chat across multiple users.
+
+---
+
+*This section (Part 3) was written by Annmarie Kongglang as part of the team’s midterm milestone assignment.*
+
+---
+
+After you paste this, scroll down and click:  
+✅ **Commit changes → Commit directly to the main branch → Commit changes**
+
+---
+
+Would you like me to add a small **diagram (Mermaid code)** showing the message flow between *Client ↔ Server ↔ Room*? It will make your README look more professional for the midterm submission.
+
+
 ---
 
 ### **5. Testing and Metrics Plan**
@@ -36,6 +110,7 @@ This project is about building a reliable multi-client chat service that runs ov
 
 
 * **Evidence of progress:** TThis README shows the work completed so far. It covers the design and planning phase in detail and lays out a clear roadmap for building and testing the rest of the project.
+
 
 
 
