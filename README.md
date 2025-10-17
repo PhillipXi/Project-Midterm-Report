@@ -24,7 +24,7 @@ This project is about building a reliable multi-client chat service that runs ov
 
 ### Command Grammar 
 
-The ** Group Chat with Rooms + Presence** application uses a text-based message structure for client-server communication. Each command or message follows this format: 
+The "Group Chat with Rooms + Presence" application uses a text-based message structure for client-server communication. Each command or message follows this format: 
 
 
 #### Client → Server Commands
@@ -43,9 +43,9 @@ The ** Group Chat with Rooms + Presence** application uses a text-based message 
 |----------|----------|-------------|
 | `SYS <text>` | `SYS Welcome to the chat server!` | System or status message. |
 | `MSG <room> <sender>: <text>` | `MSG main Ann: Hi there!` | Broadcast message sent to a room. |
-| `JOINED <room> <user>` | `JOINED main Alissa` | Notifies users when someone joins. |
-| `LEFT <room> <user>` | `LEFT main Lek` | Notifies users when someone leaves. |
-| `USERS <room> <user1,user2,...>` | `USERS main Ann, Alissa, Lek` | Lists all users in the specified room. |
+| `JOINED <room> <user>` | `JOINED main Amber` | Notifies users when someone joins. |
+| `LEFT <room> <user>` | `LEFT main Hugo` | Notifies users when someone leaves. |
+| `USERS <room> <user1,user2,...>` | `USERS main Ann, Amber, Hugo, Philip` | Lists all users in the specified room. |
 
 ---
 
@@ -96,6 +96,7 @@ The server is designed to support multiple clients using **multi-threading**:
 
 
 * **Evidence of progress:** TThis README shows the work completed so far. It covers the design and planning phase in detail and lays out a clear roadmap for building and testing the rest of the project.
+
 
 
 
