@@ -127,6 +127,24 @@ The server is designed to support multiple clients using **multi-threading**:
 ---
 
 ### **5. Testing and Metrics Plan**
+When we test are programs it will be though the command prompt with at least 3 different command prompts open. One would be for the `chat_server.py` and the other two would be the `chat_client.py`. We would then make sure that all of our commands work as intended and that we are able to connect to the server.
+to measure our performance we would have to add certain functions to calculate our metrics for the two programs. for our `chat_server.py` we would calculate the Goodput, and in our `chat_client.py` we would calculate the Throughput and retransmissions per KB. We would
+calculate the Average Latency in ms and the 95th Percentile Latency in ms for both our programs.
+### Calculations
+this table shows how to calculate our Metrics
+
+| Metric                        | Calculation                         |
+|-------------------------------|-------------------------------------|
+| `Goodput(KB/s)`               | bytes succesfilly received/duration |
+| `Throughput(KB/s)`            | bytes sent/duration                 |
+| `Avg Latency(ms)`             | Avg(receive time - send timestamps) |
+| `95th Percentile Latency(ms)` | 95th percentile of latency list     |
+| `Retransmission per KB`        | retransmit_count/(bytes sent/1024)  |
+
+
+just testing our program on a `Clean Network test` we should be able to see that everything is working as intended. We would expect a 0% packet lost, low stable latency, and all messages being sent and delivered. With `Random Network lost` the goal is to see how our program handles unpredictable packet
+loss. if our program is working as expected we should only see slight message lost with our chat staying operational. With `Bursty Network lost` the goal is to show how our program handles heavy loss to text message buffering, retransmission, or error handling in short periods.
+The result would be several lost messages in a row, but our chat client should be able to recover, or at least maintain a stable connection.
 
 ---
 
