@@ -155,7 +155,8 @@ The result would be several lost messages in a row, but our chat client should b
 * **What remains to be completed:** The main coding still needs to be done. The next steps are to build the reliability logic using a Sliding Window ARQ, add server-side concurrency so multiple clients can stay connected at once, and finish the application layer for handling commands and broadcasting messages.
 
 
-* **Evidence of progress:** TThis README shows the work completed so far. It covers the design and planning phase in detail and lays out a clear roadmap for building and testing the rest of the project.
+* **Evidence of progress:** This README shows the work completed so far. It covers the design and planning phase in detail and lays out a clear roadmap for building and testing the rest of the project.
+
 
 
 
