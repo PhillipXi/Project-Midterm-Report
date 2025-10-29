@@ -1,30 +1,53 @@
-import socket
-import threading
-name = input("Enter a name: ")
+import time
+import sys
+from transport.protocol import TransportProtocol
 
-client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-client.connect(('127.0.0.1', 20001))
+SERVER_IP = "127.0.0.1"
+SERVER_PORT = 12345
+CLIENT_PORT = 54321 # Use a different port than the server
 
-def receive():
-    while True:
-        try:
-            data = client.recv(1024).decode('utf-8')
-            if data == 'name':
-                pass
-            else:
-                print(data)
-        except:
-            print("ERROR")
-            client.close()
-            break
+def main():
+    # 1. Initialize the protocol on the client's port
+    protocol = TransportProtocol(local_port=CLIENT_PORT)
+    protocol.start()
 
-def write():
-    while True:
-        message = f'{name}: {input("Enter a message: ")}'
-        client.send(message.encode('utf-8'))
+    try:
+        # 2. Connect to the server (blocking)
+        print("Connecting to server...")
+        conn = protocol.connect((SERVER_IP, SERVER_PORT), timeout=5.0)
+        
+        print(f"Connection established! (ID: {conn.conn_id})")
+        
+        # 3. Register the on_message callback
+        def handle_server_message(data: bytes):
+            print(f"\n[App] Received from server: {data.decode('utf-8')}")
+            print("> ", end="", flush=True) # Re-draw prompt
 
-receive_thread = threading.Thread(target=receive)
-receive_thread.start()
+        protocol.on_message(conn, handle_server_message)
+        
+        # 4. Start send loop
+        print("Enter messages to send (or 'quit' to exit):")
+        while True:
+            message = input("> ")
+            if message.lower() == 'quit':
+                break
+            
+            # 5. Send the message
+            protocol.send_msg(conn, message.encode('utf-8'))
+            
+    except TimeoutError:
+        print("[App] Connection timed out. Exiting.")
+    except KeyboardInterrupt:
+        pass
+    except Exception as e:
+        print(f"[App] An error occurred: {e}")
+    finally:
+        # 6. Close the connection
+        if 'conn' in locals():
+            print("Closing connection...")
+            protocol.close(conn)
+        protocol.stop()
+        print("Client shut down.")
 
-write_thread = threading.Thread(target=write)
-write_thread.start()
+if __name__ == "__main__":
+    main()
