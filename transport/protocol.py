@@ -9,6 +9,13 @@ from .packet import (
 )
 from .connection import Connection, ConnectionState
 
+"""
+Part 2 – Connection Management and API Stub
+Implements the connection state machine, 3-way handshake (SYN/SYN-ACK/ACK),
+and application-facing API functions (connect, send_msg, on_message, close).
+This module bridges Part 1 (UDP + packets) with Parts 3 and 4 (receiver/sender).
+"""
+
 class TransportProtocol:
     # The main class implementing the Transport API. 
     # This class owns the UDP socket, manages all connections, and routes incoming packets.
