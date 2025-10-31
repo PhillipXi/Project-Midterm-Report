@@ -19,13 +19,13 @@ class ReceiverLogic:
         conn_id = self.connection.conn_id
         print(f"[Receiver {conn_id}] Got packet seq={header.seq}, expected={self.expected_seq}")
 
-        # ✅ Drop if sequence number is less than expected (duplicate)
+        # Drop if sequence number is less than expected (duplicate)
         if header.seq < self.expected_seq:
             print(f"[Receiver {conn_id}] Duplicate packet dropped (seq={header.seq})")
             self.send_ack()  # Re-ACK to confirm what we have
             return
 
-        # ✅ If it’s the next in sequence, deliver to app
+        #  If it’s the next in sequence, deliver to app
         if header.seq == self.expected_seq:
             print(f"[Receiver {conn_id}] Delivering in-order data.")
             self.connection.deliver_data_to_app(payload)
@@ -37,7 +37,7 @@ class ReceiverLogic:
                 self.connection.deliver_data_to_app(next_payload)
                 self.expected_seq += len(next_payload)
         else:
-            # ✅ Out-of-order: buffer it
+            #  Out-of-order: buffer it
             print(f"[Receiver {conn_id}] Out-of-order packet buffered (seq={header.seq})")
             self.buffer[header.seq] = payload
 
@@ -61,3 +61,4 @@ class ReceiverLogic:
         self.connection.protocol._send_raw_packet(ack_header, b'', self.connection.peer_address)
 
         print(f"[Receiver {self.connection.conn_id}] Sent ACK for seq={self.expected_seq}, rwnd={self.rwnd}")
+
