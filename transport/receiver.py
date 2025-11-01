@@ -53,7 +53,7 @@ class ReceiverLogic:
             seq=0,                # No data in ACK-only packet
             ack=self.expected_seq, # Cumulative ACK
             rwnd=self.rwnd,
-            length=0
+            length=0 #matches header field name 
         )
 
         # No payload, ACK-only packet
@@ -61,4 +61,5 @@ class ReceiverLogic:
         self.connection.protocol._send_raw_packet(ack_header, b'', self.connection.peer_address)
 
         print(f"[Receiver {self.connection.conn_id}] Sent ACK for seq={self.expected_seq}, rwnd={self.rwnd}")
+
 
