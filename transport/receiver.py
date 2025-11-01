@@ -53,7 +53,7 @@ class ReceiverLogic:
 
         while self.next_expected_seq in self.buffer:
             data = self.buffer.pop(self.next_expected_seq)
-            self.next_expected_seq += 1
+            self.next_expected_seq += len(data)
             delivered = True
 
             if self.conn.on_message_callback:
