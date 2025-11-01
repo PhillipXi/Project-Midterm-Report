@@ -208,9 +208,7 @@ class TransportProtocol:
         except Exception as e:
             print(f"Error sending packet: {e}")
 
-    # =========================================================
-    # ---------------------- Public API -----------------------
-    # =========================================================
+    # Public API 
 
     def connect(self, server_addr: Tuple[str, int], timeout=5.0) -> Connection:
         # API Connects to a server. This is a blocking call
