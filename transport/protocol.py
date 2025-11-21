@@ -16,6 +16,7 @@ from .packet import (
 )
 from .connection import Connection, ConnectionState
 
+
 class TransportProtocol:
     # The main class implementing the Transport API.
     # This class owns the UDP socket, manages all connections, and routes incoming packets.
@@ -133,9 +134,9 @@ class TransportProtocol:
         syn_ack_header = TransportHeader(
             flags=FLAG_SYN | FLAG_ACK,
             conn_id=conn_id,
-            seq=conn.sender.seq_num,
+            seq=conn.sender.next_seq,
             ack=header.seq + 1,
-            rwnd=conn.receiver.get_window_size(),
+            rwnd=conn.receiver.advertised_window,
         )
         self._send_raw_packet(syn_ack_header, b"", sender_addr)
         print(f"[Conn {conn_id}] Sent SYN-ACK to {sender_addr}.")
@@ -150,9 +151,9 @@ class TransportProtocol:
         ack_header = TransportHeader(
             flags=FLAG_ACK,
             conn_id=conn.conn_id,
-            seq=conn.sender.seq_num,
+            seq=conn.sender.next_seq,
             ack=header.seq + 1,
-            rwnd=conn.receiver.get_window_size(),
+            rwnd=conn.receiver.advertised_window,
         )
         self._send_raw_packet(ack_header, b"", sender_addr)
 
@@ -174,7 +175,7 @@ class TransportProtocol:
             flags=FLAG_ACK,
             conn_id=conn.conn_id,
             ack=header.seq + 1,
-            rwnd=conn.receiver.get_window_size(),
+            rwnd=conn.receiver.advertised_window,
         )
         self._send_raw_packet(ack_header, b"", conn.peer_address)
 
@@ -205,8 +206,8 @@ class TransportProtocol:
         syn_header = TransportHeader(
             flags=FLAG_SYN,
             conn_id=0, # No conn_id yet
-            seq=conn.sender.seq_num,
-            rwnd=conn.receiver.get_window_size()
+            seq=conn.sender.next_seq,
+            rwnd=conn.receiver.advertised_window,
         )
         self._send_raw_packet(syn_header, b"", server_addr)
 
@@ -247,8 +248,8 @@ class TransportProtocol:
         fin_header = TransportHeader(
             flags=FLAG_FIN,
             conn_id=conn.conn_id,
-            seq=conn.sender.seq_num,
-            rwnd=conn.receiver.get_window_size()
+            seq=conn.sender.next_seq,
+            rwnd=conn.receiver.advertised_window,
         )
         self._send_raw_packet(fin_header, b"", conn.peer_address)
         # The connection will be fully closed and cleaned up when the FIN-ACK is received.
