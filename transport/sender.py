@@ -23,6 +23,10 @@ class SenderLogic:
         self.unacked_packets = {}              # seq -> (packet, timer)
         self.lock = threading.Lock()
         self.advertised_window = 4096          # Updated by receiver ACKs
+        
+        self.bytes_sent = 0
+        self.retransmissions = 0
+        self.rtt_samples = []
 
     # ----------------------------------------------------
     #  Called by Part 2 send_msg()
@@ -55,6 +59,8 @@ class SenderLogic:
                 self.connection._internal_send(header, payload)
                 print(f"[Sender {self.connection.conn_id}] Sent packet seq={self.next_seq}")
 
+                self.bytes_sent += len(payload)
+
                 # Start retransmission timer
                 self.start_rto_timer(payload, self.next_seq)
                 self.next_seq += len(payload)
@@ -62,20 +68,23 @@ class SenderLogic:
     # ----------------------------------------------------
     #  Retransmission timer handling
     # ----------------------------------------------------
-    def start_rto_timer(self, payload: bytes, seq_num: int):
+    def start_rto_timer(self, header, payload: bytes, seq_num: int):
         timer = threading.Timer(RTO_VALUE, self.on_rto_expired, args=[payload, seq_num])
         timer.daemon = True
         timer.start()
-        self.unacked_packets[seq_num] = (payload, timer)
+        current_time = time.time()
+        self.unacked_packets[seq_num] = (header, payload, timer, current_time)
 
-    def on_rto_expired(self, payload: bytes, seq_num: int):
+    def on_rto_expired(self, header, payload: bytes, seq_num: int):
         """Called when an ACK hasn't arrived in time."""
         with self.lock:
             if seq_num in self.unacked_packets:
                 print(f"[Sender {self.connection.conn_id}] Timeout → retransmitting seq={seq_num}")
-                self.connection.protocol._send_raw_packet(None, payload, self.connection.peer_address)
+                self.retransmissions += 1
+                self.connection.internal_send(header, payload)
+                # self.connection.protocol._send_raw_packet(None, payload, self.connection.peer_address)
                 # restart timer
-                self.start_rto_timer(payload, seq_num)
+                self.start_rto_timer(header, payload, seq_num)
 
     # ----------------------------------------------------
     #  ACK handling
@@ -88,10 +97,14 @@ class SenderLogic:
             # Remove all packets fully acknowledged
             to_remove = [seq for seq in self.unacked_packets if seq < ack_num]
             for seq in to_remove:
-                header, timer = self.unacked_packets.pop(seq)
+                header, payload, timer, send_time = self.unacked_packets.pop(seq)
                 if isinstance(timer, threading.Timer):
                     timer.cancel()
-                print(f"[Sender {self.connection.conn_id}] Packet seq={seq} ACKed and removed.")
+                    
+                rtt = time.time() - send_time
+                self.rtt_samples.append(rtt)
+                
+                print(f"[Sender {self.connection.conn_id}] Packet seq={seq} ACKed. RTT={rtt:.4f}s")
 
             # Slide window forward
             self.base_seq = ack_num
